@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#05050a">
+<title>دگردیسی — پنج گل و یک چهره</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23d9a441' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='8' fill='%23d9a441'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+  href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200;400;700&family=JetBrains+Mono:wght@300;400&display=swap">
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200;400;700&family=JetBrains+Mono:wght@300;400&display=swap">
+</noscript>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #05050a;
+    color: #e8e2d4;
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
+    cursor: crosshair;
+    overscroll-behavior: none;
+  }
+
+  #stage {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .grain {
+    position: fixed;
+    inset: -50%;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 8s steps(8) infinite;
+  }
+  @keyframes grainShift {
+    0%   { transform: translate(0, 0); }
+    20%  { transform: translate(-2%, -1%); }
+    40%  { transform: translate(1%, 2%); }
+    60%  { transform: translate(-1%, 1%); }
+    80%  { transform: translate(2%, -1%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      transparent 0%,
+      transparent 38%,
+      rgba(5, 5, 10, 0.35) 58%,
+      rgba(5, 5, 10, 0.82) 80%,
+      #05050a 100%
+    );
+  }
+
+  .center-mark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 80;
+    pointer-events: none;
+    text-align: center;
+    animation: breathe 6s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.95; }
+  }
+  .center-mark .phi {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(24px, 5vw, 44px);
+    color: #d9a441;
+    line-height: 1;
+    text-shadow:
+      0 0 24px rgba(217, 164, 65, 0.55),
+      0 0 60px rgba(217, 164, 65, 0.25);
+    letter-spacing: 0.05em;
+    transition: opacity 0.4s ease;
+  }
+  .center-mark .label {
+    display: block;
+    margin-top: 12px;
+    font-size: clamp(9px, 1.6vw, 11px);
+    font-weight: 400;
+    letter-spacing: 0.55em;
+    color: rgba(232, 226, 212, 0.5);
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    transition: opacity 0.4s ease;
+    min-height: 14px;
+  }
+
+  .hud {
+    position: fixed;
+    z-index: 70;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    color: rgba(232, 226, 212, 0.32);
+    pointer-events: none;
+    text-transform: uppercase;
+    user-select: none;
+  }
+  .hud.tl { top: 22px; left: 22px; }
+  .hud.tr { top: 22px; right: 22px; text-align: right; }
+  .hud.bl { bottom: 22px; left: 22px; }
+  .hud.br { bottom: 22px; right: 22px; text-align: right; }
+
+  .hud .dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #d9a441;
+    margin-inline-end: 6px;
+    vertical-align: middle;
+    box-shadow: 0 0 8px #d9a441;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
+
+  .hud .depth {
+    display: block;
+    margin-top: 4px;
+    color: rgba(217, 164, 65, 0.55);
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+  }
+
+  .progress-track {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    border-radius: 100px;
+    background: rgba(13, 13, 21, 0.55);
+    border: 1px solid rgba(217, 164, 65, 0.12);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    pointer-events: none;
+    user-select: none;
+  }
+  .progress-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(232, 226, 212, 0.18);
+    transition: all 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    flex-shrink: 0;
+  }
+  .progress-dot.active {
+    width: 22px;
+    border-radius: 100px;
+    box-shadow: 0 0 14px currentColor;
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 78px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 70;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    color: rgba(232, 226, 212, 0.28);
+    text-transform: uppercase;
+    pointer-events: none;
+    animation: hintFade 5s ease-in-out infinite;
+    white-space: nowrap;
+    text-align: center;
+  }
+  @keyframes hintFade {
+    0%, 100% { opacity: 0.2; }
+    50%      { opacity: 0.6; }
+  }
+  .hint .sensor-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    color: rgba(217, 164, 65, 0.5);
+  }
+
+  .pause-btn {
+    position: fixed;
+    top: 50%;
+    inset-inline-end: 22px;
+    transform: translateY(-50%);
+    z-index: 200;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(217, 164, 65, 0.22);
+    background: rgba(217, 164, 65, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(217, 164, 65, 0.75);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+  .pause-btn:hover {
+    background: rgba(217, 164, 65, 0.14);
+    border-color: rgba(217, 164, 65, 0.5);
+    color: #d9a441;
+  }
+  .pause-btn svg { width: 14px; height: 14px; }
+  .pause-btn .icon-play { display: none; }
+  .pause-btn.paused .icon-pause { display: none; }
+  .pause-btn.paused .icon-play { display: block; }
+
+  @media (max-width: 600px) {
+    .hud { font-size: 9px; letter-spacing: 0.2em; }
+    .hud.tl, .hud.tr { top: 16px; }
+    .hud.tl { left: 14px; } .hud.tr { right: 14px; }
+    .hud.bl { bottom: 16px; left: 14px; }
+    .hud.br { bottom: 16px; right: 14px; }
+    .pause-btn {
+      top: auto;
+      bottom: 78px;
+      inset-inline-end: 14px;
+      transform: none;
+    }
+    .hint { bottom: 128px; font-size: 9px; letter-spacing: 0.22em; }
+    .progress-track { padding: 6px 14px; gap: 8px; }
+    .progress-dot { width: 5px; height: 5px; }
+    .progress-dot.active { width: 18px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain, .center-mark, .hud .dot, .hint { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stage"></canvas>
+
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="center-mark" aria-hidden="true">
+  <span class="phi">φ</span>
+  <span class="label" id="shapeLabel">ROSE</span>
+</div>
+
+<div class="hud tl" aria-hidden="true">
+  <span class="dot"></span>METAMORPHOSIS
+  <span class="depth" id="shapeNum">01 / 06</span>
+</div>
+<div class="hud tr" aria-hidden="true">
+  PHASE · <span id="phaseLabel">MORPH</span>
+  <span class="depth" id="fpsLabel">60 fps</span>
+</div>
+<div class="hud bl" aria-hidden="true">
+  <span id="particleCount">0</span> PARTICLES
+</div>
+<div class="hud br" aria-hidden="true">
+  <span id="sensorLabel">SENSOR · OFF</span>
+</div>
+
+<div class="hint" aria-hidden="true">
+  CLICK · TO · TRANSFORM
+  <span class="sensor-hint" id="sensorHint">TILT YOUR PHONE TO MAKE PARTICLES MOVE</span>
+</div>
+
+<div class="progress-track" id="progressTrack" aria-hidden="true"></div>
+
+<button class="pause-btn" id="pauseBtn" type="button" aria-label="توقف / ادامه">
+  <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="6" y="4" width="4" height="16" rx="1"/>
+    <rect x="14" y="4" width="4" height="16" rx="1"/>
+  </svg>
+  <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M8 5v14l11-7z"/>
+  </svg>
+</button>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ═══════════════════════════════════════════════════════
+     ابزارها
+     ═══════════════════════════════════════════════════════ */
+  const canvas = document.getElementById('stage');
+  const ctx = canvas.getContext('2d', { alpha: false });
+
+  const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = matchMedia('(max-width: 768px)').matches;
+  const lowEnd = (navigator.hardwareConcurrency || 4) <= 4;
+  const DPR_CAP = isMobile || lowEnd ? 1.6 : 2;
+
+  const TAU = Math.PI * 2;
+  const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function mixColor(a, b, k) {
+    return {
+      r: Math.round(a.r + (b.r - a.r) * k),
+      g: Math.round(a.g + (b.g - a.g) * k),
+      b: Math.round(a.b + (b.b - a.b) * k)
+    };
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     ابعاد
+     ═══════════════════════════════════════════════════════ */
+  let W = 0, H = 0, CX = 0, CY = 0, SCALE = 0, dpr = 1;
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
+    W = Math.max(1, rect.width);
+    H = Math.max(1, rect.height);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    CX = W / 2;
+    CY = H / 2;
+    SCALE = Math.min(W, H) * 0.42;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     ابزار شکل‌سازی
+     ═══════════════════════════════════════════════════════ */
+
+  /* تبدیل مسیر خطی به لیست نقاط یکنواخت */
+  function pathToPoints(path, count, jitter, colorFn) {
+    const segs = [];
+    let total = 0;
+    for (let i = 0; i < path.length - 1; i++) {
+      const len = Math.hypot(path[i + 1][0] - path[i][0], path[i + 1][1] - path[i][1]);
+      segs.push(len);
+      total += len;
+    }
+    const out = [];
+    if (total === 0 || count === 0) return out;
+    for (let i = 0; i < count; i++) {
+      const t = total * i / (count - 1);
+      let acc = 0, si = 0;
+      while (si < segs.length - 1 && acc + segs[si] < t) {
+        acc += segs[si]; si++;
+      }
+      const lt = segs[si] > 0 ? (t - acc) / segs[si] : 0;
+      const p0 = path[si], p1 = path[si + 1];
+      const x = p0[0] + (p1[0] - p0[0]) * lt;
+      const y = p0[1] + (p1[1] - p0[1]) * lt;
+      const c = colorFn(i / count, si / Math.max(1, segs.length - 1));
+      out.push({
+        x: x + (Math.random() - 0.5) * jitter,
+        y: y + (Math.random() - 0.5) * jitter,
+        r: c.r, g: c.g, b: c.b
+      });
+    }
+    return out;
+  }
+
+  /* Mirror helper */
+  function mirrorPath(halfPath) {
+    const full = halfPath.slice();
+    for (let i = halfPath.length - 2; i >= 0; i--) {
+      full.push([-halfPath[i][0], halfPath[i][1]]);
+    }
+    return full;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     ۵ گل + یک چهره
+     ═══════════════════════════════════════════════════════ */
+  const ShapeGen = {
+
+    /* ─── ۱. گل رز — صورتی ─── */
+    rose(n) {
+      const pts = [];
+      const centerN = Math.floor(n * 0.22);
+      const petalN = n - centerN;
+
+      /* مرکز مارپیچ */
+      for (let i = 0; i < centerN; i++) {
+        const t = i / centerN;
+        const a = t * Math.PI * 16;
+        const r = 0.03 + t * 0.28;
+        const k = 0.4 + t * 0.6;
+        pts.push({
+          x: Math.cos(a) * r,
+          y: Math.sin(a) * r,
+          r: Math.round(180 + k * 60),
+          g: Math.round(50 + k * 30),
+          b: Math.round(90 + k * 50)
+        });
+      }
+
+      /* گلبرگ‌های چندلایه */
+      const rings = 5;
+      const ringColors = [
+        { r: 255, g: 180, b: 200 },
+        { r: 255, g: 150, b: 180 },
+        { r: 245, g: 120, b: 155 },
+        { r: 225, g: 90, b: 130 },
+        { r: 200, g: 70, b: 110 }
+      ];
+      for (let ring = 0; ring < rings; ring++) {
+        const ringT = ring / (rings - 1);
+        const rBase = 0.30 + ringT * 0.55;
+        const petals = 6 + ring * 3;
+        const count = Math.floor(petalN / rings);
+        const perPetal = Math.max(1, Math.floor(count / petals));
+        const rot = ring * 0.42;
+        const col = ringColors[ring];
+        for (let p = 0; p < petals; p++) {
+          const baseAng = (p / petals) * TAU + rot;
+          for (let i = 0; i < perPetal; i++) {
+            const t = i / perPetal;
+            const r = rBase + t * (0.10 + ringT * 0.02);
+            const width = Math.sin(t * Math.PI) * (0.12 + ringT * 0.04);
+            const jitter = (Math.random() - 0.5) * width;
+            const normAng = baseAng + Math.PI / 2;
+            const c = mixColor(col, { r: 255, g: 220, b: 235 }, 0.25 * Math.random());
+            pts.push({
+              x: Math.cos(baseAng) * r + Math.cos(normAng) * jitter,
+              y: Math.sin(baseAng) * r + Math.sin(normAng) * jitter,
+              r: c.r, g: c.g, b: c.b
+            });
+          }
+        }
+      }
+
+      while (pts.length < n) {
+        const a = Math.random() * TAU;
+        const r = Math.sqrt(Math.random()) * 0.2;
+        pts.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, r: 230, g: 100, b: 140 });
+      }
+      return pts.slice(0, n);
+    },
+
+    /* ─── ۲. گل دیزی — سفید و طلایی ─── */
+    daisy(n) {
+      const pts = [];
+      const centerN = Math.floor(n * 0.22);
+      const petalN = n - centerN;
+
+      /* مرکز زرد (فیلوتاکسی) */
+      const GA = Math.PI * (3 - Math.sqrt(5));
+      for (let i = 0; i < centerN; i++) {
+        const r = Math.sqrt(i / centerN) * 0.20;
+        const a = i * GA;
+        const t = i / centerN;
+        pts.push({
+          x: Math.cos(a) * r,
+          y: Math.sin(a) * r,
+          r: Math.round(255 - t * 30),
+          g: Math.round(200 - t * 40),
+          b: Math.round(70 - t * 20)
+        });
+      }
+
+      /* گلبرگ‌های سفید بلند */
+      const petals = 16;
+      const perPetal = Math.max(2, Math.floor(petalN / petals));
+      for (let p = 0; p < petals; p++) {
+        const baseAng = (p / petals) * TAU - Math.PI / 2;
+        const localN = perPetal + (p < petalN % petals ? 1 : 0);
+        for (let i = 0; i < localN; i++) {
+          const t = i / Math.max(1, localN - 1);
+          const r = 0.18 + t * 0.68;
+          const width = Math.sin(t * Math.PI) * 0.10;
+          const jitter = (Math.random() - 0.5) * width;
+          const normAng = baseAng + Math.PI / 2;
+          const shade = 0.7 + Math.random() * 0.3;
+          pts.push({
+            x: Math.cos(baseAng) * r + Math.cos(normAng) * jitter,
+            y: Math.sin(baseAng) * r + Math.sin(normAng) * jitter,
+            r: Math.round(250 * shade + 5),
+            g: Math.round(248 * shade + 7),
+            b: Math.round(235 * shade + 20)
+          });
+        }
+      }
+
+      while (pts.length < n) {
+        pts.push({ x: rand(-0.1, 0.1), y: rand(-0.1, 0.1), r: 255, g: 220, b: 90 });
+      }
+      return pts.slice(0, n);
+    },
+
+    /* ─── ۳. گل آفتابگردان — طلایی ─── */
+    sunflower(n) {
+      const pts = [];
+      const centerN = Math.floor(n * 0.28);
+      const petalN = n - centerN;
+
+      /* مرکز قهوه‌ای تیره با چیدمان فیلوتاکسی */
+      const GA = Math.PI * (3 - Math.sqrt(5));
+      for (let i = 0; i < centerN; i++) {
+        const t = i / centerN;
+        const r = Math.sqrt(i / centerN) * 0.32;
+        const a = i * GA;
+        const dark = 0.4 + Math.random() * 0.5;
+        pts.push({
+          x: Math.cos(a) * r,
+          y: Math.sin(a) * r,
+          r: Math.round(60 + dark * 40),
+          g: Math.round(35 + dark * 30),
+          b: Math.round(20 + dark * 20)
+        });
+      }
+
+      /* گلبرگ‌های تیز طلایی */
+      const petals = 24;
+      const perPetal = Math.max(2, Math.floor(petalN / petals));
+      for (let p = 0; p < petals; p++) {
+        const baseAng = (p / petals) * TAU;
+        const localN = perPetal + (p < petalN % petals ? 1 : 0);
+        for (let i = 0; i < localN; i++) {
+          const t = i / Math.max(1, localN - 1);
+          const r = 0.30 + t * 0.62;
+          /* گلبرگ تیز: عرض از 0 شروع و به 0 می‌رسد */
+          const width = Math.sin(t * Math.PI) * 0.055 * (1 - t * 0.4);
+          const jitter = (Math.random() - 0.5) * width;
+          const normAng = baseAng + Math.PI / 2;
+          const golden = 0.75 + Math.random() * 0.25;
+          const col = mixColor(
+            { r: 255, g: 200, b: 60 },
+            { r: 255, g: 140, b: 30 },
+            t
+          );
+          pts.push({
+            x: Math.cos(baseAng) * r + Math.cos(normAng) * jitter,
+            y: Math.sin(baseAng) * r + Math.sin(normAng) * jitter,
+            r: Math.round(col.r * golden),
+            g: Math.round(col.g * golden),
+            b: Math.round(col.b * golden)
+          });
+        }
+      }
+
+      while (pts.length < n) {
+        pts.push({ x: rand(-0.15, 0.15), y: rand(-0.15, 0.15), r: 80, g: 50, b: 25 });
+      }
+      return pts.slice(0, n);
+    },
+
+    /* ─── ۴. گل نیلوفر — بنفش ─── */
+    lotus(n) {
+      const pts = [];
+      const centerN = Math.floor(n * 0.10);
+      const petalN = n - centerN;
+
+      /* مرکز طلایی */
+      for (let i = 0; i < centerN; i++) {
+        const a = Math.random() * TAU;
+        const r = Math.sqrt(Math.random()) * 0.13;
+        pts.push({
+          x: Math.cos(a) * r,
+          y: Math.sin(a) * r,
+          r: 255, g: 230, b: 140
+        });
+      }
+
+      /* ۳ لایه گلبرگ نوک‌تیز */
+      const layers = 3;
+      const layerColors = [
+        { r: 235, g: 190, b: 255 },  /* روشن */
+        { r: 190, g: 140, b: 240 },  /* متوسط */
+        { r: 140, g: 90, b: 200 }    /* تیره */
+      ];
+      for (let layer = 0; layer < layers; layer++) {
+        const layerT = layer / (layers - 1);
+        const petals = 8 + layer * 2;
+        const rBase = 0.14 + layerT * 0.28;
+        const rMax = rBase + 0.42 - layerT * 0.05;
+        const count = Math.floor(petalN / layers);
+        const perPetal = Math.max(2, Math.floor(count / petals));
+        const rot = layer * 0.22;
+        const col = layerColors[layer];
+        for (let p = 0; p < petals; p++) {
+          const baseAng = (p / petals) * TAU + rot;
+          for (let i = 0; i < perPetal; i++) {
+            const t = i / perPetal;
+            const r = rBase + t * (rMax - rBase);
+            /* نوک‌تیز */
+            const width = Math.sin(t * Math.PI) * 0.09 * (1 - t * 0.5);
+            const jitter = (Math.random() - 0.5) * width;
+            const normAng = baseAng + Math.PI / 2;
+            const c = mixColor(col, { r: 255, g: 245, b: 255 }, t * 0.35);
+            pts.push({
+              x: Math.cos(baseAng) * r + Math.cos(normAng) * jitter,
+              y: Math.sin(baseAng) * r + Math.sin(normAng) * jitter,
+              r: c.r, g: c.g, b: c.b
+            });
+          }
+        }
+      }
+
+      while (pts.length < n) {
+        pts.push({ x: rand(-0.1, 0.1), y: rand(-0.1, 0.1), r: 220, g: 180, b: 255 });
+      }
+      return pts.slice(0, n);
+    },
+
+    /* ─── ۵. گل شقایق — سرخ ─── */
+    poppy(n) {
+      const pts = [];
+      const centerN = Math.floor(n * 0.14);
+      const petalN = n - centerN;
+
+      /* مرکز تیره */
+      for (let i = 0; i < centerN; i++) {
+        const a = Math.random() * TAU;
+        const r = Math.sqrt(Math.random()) * 0.16;
+        pts.push({
+          x: Math.cos(a) * r,
+          y: Math.sin(a) * r,
+          r: 30 + Math.random() * 25,
+          g: 20 + Math.random() * 15,
+          b: 25 + Math.random() * 20
+        });
+      }
+
+      /* ۵ گلبرگ بزرگ و نرم */
+      const petals = 5;
+      const perPetal = Math.floor(petalN / petals);
+      for (let p = 0; p < petals; p++) {
+        const baseAng = (p / petals) * TAU - Math.PI / 2 + 0.15;
+        const localN = perPetal + (p < petalN % petals ? 1 : 0);
+        for (let i = 0; i < localN; i++) {
+          const t = i / Math.max(1, localN - 1);
+          const r = 0.10 + t * 0.78;
+          /* گلبرگ پهن و گنبدی */
+          const width = Math.sin(t * Math.PI) * 0.22;
+          const jitter = (Math.random() - 0.5) * width;
+          const normAng = baseAng + Math.PI / 2;
+          const shade = 0.55 + Math.random() * 0.45;
+          /* رگه‌های تیره در مرکز گلبرگ */
+          const vein = Math.abs(jitter) < width * 0.15 ? 0.55 : 1;
+          pts.push({
+            x: Math.cos(baseAng) * r + Math.cos(normAng) * jitter,
+            y: Math.sin(baseAng) * r + Math.sin(normAng) * jitter,
+            r: Math.round(230 * shade * vein),
+            g: Math.round(50 * shade * vein),
+            b: Math.round(55 * shade * vein)
+          });
+        }
+      }
+
+      while (pts.length < n) {
+        pts.push({ x: rand(-0.1, 0.1), y: rand(-0.1, 0.1), r: 40, g: 25, b: 30 });
+      }
+      return pts.slice(0, n);
+    },
+
+    /* ─── چهره زن — تمام رخ ─── */
+    woman(n) {
+      const pts = [];
+
+      /* تخصیص بودجه */
+      const outlineN   = Math.floor(n * 0.16);
+      const hairN      = Math.floor(n * 0.28);
+      const browN      = Math.floor(n * 0.06);
+      const eyeN       = Math.floor(n * 0.14);
+      const irisN      = Math.floor(n * 0.04);
+      const noseN      = Math.floor(n * 0.05);
+      const lipsN      = Math.floor(n * 0.10);
+      const cheekN     = Math.floor(n * 0.07);
+      const chinN      = Math.floor(n * 0.04);
+      const foreheadN  = n - outlineN - hairN - browN - eyeN - irisN - noseN - lipsN - cheekN - chinN;
+
+      const skin = { r: 240, g: 200, b: 175 };
+      const skinShadow = { r: 210, g: 165, b: 145 };
+      const skinLight = { r: 252, g: 220, b: 195 };
+
+      /* ── خط بیرونی صورت (بیضی) ── */
+      const faceHalf = [
+        [0.00, -0.78],
+        [0.14, -0.76],
+        [0.26, -0.69],
+        [0.35, -0.57],
+        [0.41, -0.43],
+        [0.44, -0.26],
+        [0.45, -0.08],
+        [0.44, 0.10],
+        [0.41, 0.27],
+        [0.35, 0.43],
+        [0.26, 0.57],
+        [0.14, 0.68],
+        [0.00, 0.74]
+      ];
+      const faceFull = mirrorPath(faceHalf);
+
+      pts.push.apply(pts, pathToPoints(faceFull, outlineN, 0.008, () => skinShadow));
+
+      /* ── موهای جاری دو طرف ── */
+      const hairHalf = [
+        [0.06, -0.86],
+        [0.22, -0.88],
+        [0.38, -0.82],
+        [0.52, -0.68],
+        [0.62, -0.48],
+        [0.68, -0.22],
+        [0.70, 0.05],
+        [0.68, 0.32],
+        [0.64, 0.58],
+        [0.58, 0.82],
+        [0.52, 1.02],
+        [0.44, 1.18],
+        [0.34, 1.28],
+        [0.22, 1.34],
+        [0.10, 1.36]
+      ];
+      const hairFull = mirrorPath(hairHalf);
+
+      /* لایه بیرونی مو */
+      pts.push.apply(pts, pathToPoints(hairFull, Math.floor(hairN * 0.6), 0.02, (t) => {
+        return mixColor({ r: 45, g: 28, b: 35 }, { r: 75, g: 42, b: 45 }, t);
+      }));
+
+      /* لایه داخلی مو (نزدیک‌تر به صورت) */
+      const hairInner = hairHalf.map(([x, y]) => [x * 0.72, y * 0.95]);
+      const hairInnerFull = mirrorPath(hairInner);
+      pts.push.apply(pts, pathToPoints(hairInnerFull, Math.floor(hairN * 0.4), 0.03, () => {
+        return { r: 30, g: 18, b: 25 };
+      }));
+
+      /* ── ابروها ── */
+      const browHalf = [
+        [0.10, -0.32],
+        [0.18, -0.36],
+        [0.26, -0.35],
+        [0.33, -0.31]
+      ];
+      const browFull = mirrorPath(browHalf);
+      pts.push.apply(pts, pathToPoints(browFull, browN, 0.01, () => ({ r: 40, g: 25, b: 30 })));
+
+      /* ── چشم‌ها ── */
+      /* خط بالای چشم */
+      const eyeTopHalf = [
+        [0.07, -0.16],
+        [0.12, -0.21],
+        [0.20, -0.23],
+        [0.28, -0.21],
+        [0.34, -0.15]
+      ];
+      const eyeTopFull = mirrorPath(eyeTopHalf);
+      pts.push.apply(pts, pathToPoints(eyeTopFull, Math.floor(eyeN * 0.55), 0.005, () => ({ r: 25, g: 15, b: 20 })));
+
+      /* خط پایین چشم */
+      const eyeBotHalf = [
+        [0.07, -0.16],
+        [0.14, -0.11],
+        [0.22, -0.09],
+        [0.30, -0.12],
+        [0.34, -0.15]
+      ];
+      const eyeBotFull = mirrorPath(eyeBotHalf);
+      pts.push.apply(pts, pathToPoints(eyeBotFull, Math.floor(eyeN * 0.45), 0.005, () => ({ r: 25, g: 15, b: 20 })));
+
+      /* ── عنبیه و مردمک ── */
+      const irisR = 0.055;
+      const pupilR = 0.024;
+      for (let i = 0; i < irisN; i++) {
+        const a = Math.random() * TAU;
+        const t = Math.random();
+        const rr = Math.sqrt(t) * irisR;
+        /* رنگ عنبیه — سبز-قهوه‌ای */
+        const c = mixColor(
+          { r: 90, g: 130, b: 90 },
+          { r: 140, g: 100, b: 60 },
+          t
+        );
+        /* انعکاس نوری */
+        const highlight = Math.random() < 0.15;
+        const cx = 0.20;
+        const cy = -0.16;
+        const px = Math.cos(a) * rr;
+        const py = Math.sin(a) * rr;
+        /* قرینه برای چشم چپ */
+        pts.push({ x: cx + px, y: cy + py,
+          r: highlight ? 255 : c.r,
+          g: highlight ? 255 : c.g,
+          b: highlight ? 250 : c.b });
+        pts.push({ x: -cx + px, y: cy + py,
+          r: highlight ? 255 : c.r,
+          g: highlight ? 255 : c.g,
+          b: highlight ? 250 : c.b });
+      }
+
+      /* مردمک */
+      for (let i = 0; i < Math.floor(irisN * 0.4); i++) {
+        const a = Math.random() * TAU;
+        const r = Math.random() * pupilR;
+        pts.push({
+          x: 0.20 + Math.cos(a) * r,
+          y: -0.16 + Math.sin(a) * r,
+          r: 15, g: 12, b: 18
+        });
+        pts.push({
+          x: -0.20 + Math.cos(a) * r,
+          y: -0.16 + Math.sin(a) * r,
+          r: 15, g: 12, b: 18
+        });
+      }
+
+      /* ── بینی ── */
+      const noseHalf = [
+        [0.04, -0.08],
+        [0.06, 0.02],
+        [0.08, 0.10],
+        [0.06, 0.15],
+        [0.03, 0.17]
+      ];
+      const noseFull = mirrorPath(noseHalf);
+      pts.push.apply(pts, pathToPoints(noseFull, noseN, 0.006, () => skinShadow));
+
+      /* ── لب‌ها ── */
+      /* لب بالا */
+      const lipTopHalf = [
+        [0.00, 0.26],
+        [0.05, 0.24],
+        [0.10, 0.27],
+        [0.14, 0.26]
+      ];
+      const lipTopFull = mirrorPath(lipTopHalf);
+      pts.push.apply(pts, pathToPoints(lipTopFull, Math.floor(lipsN * 0.5), 0.006, () => ({ r: 195, g: 95, b: 105 })));
+
+      /* لب پایین */
+      const lipBotHalf = [
+        [0.00, 0.30],
+        [0.06, 0.34],
+        [0.11, 0.33],
+        [0.14, 0.29]
+      ];
+      const lipBotFull = mirrorPath(lipBotHalf);
+      pts.push.apply(pts, pathToPoints(lipBotFull, Math.floor(lipsN * 0.5), 0.006, () => ({ r: 210, g: 105, b: 115 })));
+
+      /* ── گونه‌ها ── */
+      for (let i = 0; i < cheekN; i++) {
+        const side = i % 2 === 0 ? 1 : -1;
+        const a = Math.random() * TAU;
+        const r = Math.sqrt(Math.random()) * 0.12;
+        const x = side * 0.26 + Math.cos(a) * r;
+        const y = 0.05 + Math.sin(a) * r;
+        /* رژ گونه */
+        const blush = 0.5 + Math.random() * 0.5;
+        pts.push({
+          x: x, y: y,
+          r: Math.round(240 * 0.85 + 30 * blush),
+          g: Math.round(180 - 20 * blush),
+          b: Math.round(170 - 20 * blush)
+        });
+      }
+
+      /* ── چانه و سایه ── */
+      for (let i = 0; i < chinN; i++) {
+        const a = Math.random() * TAU;
+        const r = Math.sqrt(Math.random()) * 0.09;
+        const x = Math.cos(a) * r;
+        const y = 0.56 + Math.sin(a) * r;
+        pts.push({ x: x, y: y, r: 215, g: 170, b: 150 });
+      }
+
+      /* ── پیشانی روشن ── */
+      for (let i = 0; i < foreheadN; i++) {
+        const a = Math.random() * TAU;
+        const r = Math.sqrt(Math.random()) * 0.20;
+        pts.push({
+          x: Math.cos(a) * r,
+          y: -0.48 + Math.sin(a) * r * 0.7,
+          r: skinLight.r, g: skinLight.g, b: skinLight.b
+        });
+      }
+
+      /* پر کردن */
+      while (pts.length < n) {
+        const a = Math.random() * TAU;
+        const r = Math.sqrt(Math.random()) * 0.30;
+        pts.push({
+          x: Math.cos(a) * r,
+          y: Math.sin(a) * r - 0.05,
+          r: skin.r, g: skin.g, b: skin.b
+        });
+      }
+
+      return pts.slice(0, n);
+    }
+  };
+
+  /* ═══════════════════════════════════════════════════════
+     متادیتا
+     ═══════════════════════════════════════════════════════ */
+  const SHAPE_ORDER = ['rose', 'daisy', 'sunflower', 'lotus', 'poppy', 'woman'];
+  const SHAPE_META = {
+    rose:      { label: 'ROSE',      rotation: 0.045, color: '#d97ba0' },
+    daisy:     { label: 'DAISY',     rotation: 0.030, color: '#e8e0b8' },
+    sunflower: { label: 'SUNFLOWER', rotation: 0.022, color: '#e6b040' },
+    lotus:     { label: 'LOTUS',     rotation: 0.018, color: '#b48ae6' },
+    poppy:     { label: 'POPPY',     rotation: 0.038, color: '#d64550' },
+    woman:     { label: 'WOMAN',     rotation: 0.006, color: '#e0b89a' }
+  };
+
+  /* ═══════════════════════════════════════════════════════
+     ذرات — بیشتر از قبل
+     ═══════════════════════════════════════════════════════ */
+  const N = prefersReduced ? 500 : (isMobile || lowEnd ? 900 : 1500);
+
+  const particles = [];
+  for (let i = 0; i < N; i++) {
+    const a = Math.random() * TAU;
+    const r = 0.4 + Math.random() * 0.6;
+    particles.push({
+      /* موقعیت شکل */
+      cx: Math.cos(a) * r,
+      cy: Math.sin(a) * r,
+      sx: 0, sy: 0,
+      tx: 0, ty: 0,
+      /* رنگ */
+      cr: 217, cg: 164, cb: 65,
+      sr: 217, sg: 164, sb: 65,
+      tr: 217, tg: 164, tb: 65,
+      /* فیزیک */
+      ox: 0, oy: 0,      /* offset فعلی از موقعیت شکل */
+      vx: 0, vy: 0,      /* velocity */
+      /* ویژگی‌ها */
+      size: 0.85 + Math.random() * 0.7,
+      seed: Math.random() * TAU,
+      sensitivity: 0.6 + Math.random() * 0.9,
+      sway: 0.4 + Math.random() * 0.9
+    });
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     State
+     ═══════════════════════════════════════════════════════ */
+  let currentShape = 'rose';
+  let morphProgress = 1;
+  const MORPH_DURATION = 1.5;    /* سریع‌تر */
+  const HOLD_DURATION = 3.5;     /* سریع‌تر */
+  let holdTimer = 0;
+  let time = 0;
+  let globalRotation = 0;
+  let paused = false;
+  let targetPause = 1;
+  let currentPause = 1;
+  let running = true;
+  let rafId = null;
+  let lastT = performance.now();
+  let fpsAcc = 0, fpsCount = 0;
+
+  /* pointer / sensor */
+  let targetMX = 0.5, targetMY = 0.5;
+  let currentMX = 0.5, currentMY = 0.5;
+  let sensorActive = false;
+  let motionMagnitude = 0;   /* برای shake اضافه */
+
+  /* ═══════════════════════════════════════════════════════
+     تخصیص شکل
+     ═══════════════════════════════════════════════════════ */
+  function assignShape(shapeName) {
+    const targets = ShapeGen[shapeName](N);
+
+    /* مرتب‌سازی زاویه‌ای برای morph نرم */
+    const pSorted = particles.map((p, i) => ({
+      p, a: Math.atan2(p.cy, p.cx)
+    })).sort((A, B) => A.a - B.a);
+
+    const tSorted = targets.map((t) => ({
+      t, a: Math.atan2(t.y, t.x)
+    })).sort((A, B) => A.a - B.a);
+
+    for (let i = 0; i < N; i++) {
+      const p = pSorted[i].p;
+      const t = tSorted[i].t;
+      p.sx = p.cx; p.sy = p.cy;
+      p.tx = t.x;  p.ty = t.y;
+      p.sr = p.cr; p.sg = p.cg; p.sb = p.cb;
+      p.tr = t.r;  p.tg = t.g;  p.tb = t.b;
+    }
+
+    currentShape = shapeName;
+    morphProgress = 0;
+    holdTimer = 0;
+
+    updateShapeUI();
+  }
+
+  function updateShapeUI() {
+    const idx = SHAPE_ORDER.indexOf(currentShape);
+    const labelEl = document.getElementById('shapeLabel');
+    const numEl = document.getElementById('shapeNum');
+    const phaseEl = document.getElementById('phaseLabel');
+
+    if (labelEl) {
+      labelEl.style.opacity = '0';
+      setTimeout(() => {
+        labelEl.textContent = SHAPE_META[currentShape].label;
+        labelEl.style.opacity = '1';
+      }, 200);
+    }
+    if (numEl) {
+      numEl.textContent = String(idx + 1).padStart(2, '0') + ' / ' +
+                         String(SHAPE_ORDER.length).padStart(2, '0');
+    }
+    if (phaseEl) phaseEl.textContent = 'MORPH';
+
+    const track = document.getElementById('progressTrack');
+    if (track) {
+      const color = SHAPE_META[currentShape].color;
+      track.innerHTML = SHAPE_ORDER.map((s, i) => {
+        const c = i === idx ? SHAPE_META[s].color : 'rgba(232, 226, 212, 0.18)';
+        return '<span class="progress-dot' + (i === idx ? ' active' : '') +
+               '" style="background:' + c + ';color:' + c + '"></span>';
+      }).join('');
+    }
+  }
+
+  function nextShape() {
+    const idx = SHAPE_ORDER.indexOf(currentShape);
+    assignShape(SHAPE_ORDER[(idx + 1) % SHAPE_ORDER.length]);
+  }
+
+  function prevShape() {
+    const idx = SHAPE_ORDER.indexOf(currentShape);
+    assignShape(SHAPE_ORDER[(idx - 1 + SHAPE_ORDER.length) % SHAPE_ORDER.length]);
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     رسم — بدون bloom
+     ═══════════════════════════════════════════════════════ */
+  function draw() {
+    /* fade پس‌زمینه */
+    const fadeAlpha = morphProgress < 1 ? 0.12 : 0.18;
+    ctx.fillStyle = 'rgba(5, 5, 10, ' + fadeAlpha + ')';
+    ctx.fillRect(0, 0, W, H);
+
+    /* پارالاکس ملایم */
+    const px = (currentMX - 0.5) * 26;
+    const py = (currentMY - 0.5) * 26;
+
+    /* نفس‌کشیدن */
+    const breathe = 1 + Math.sin(time * 0.55) * 0.025 * currentPause;
+
+    /* چرخش شکل */
+    const shapeRot = SHAPE_META[currentShape].rotation * time * currentPause;
+
+    /* هالهٔ بسیار ملایم مرکزی — تنها گرادیان باقی‌مانده */
+    const glowR = Math.min(W, H) * 0.6;
+    const glowIntensity = 0.035 + (1 - morphProgress) * 0.04;
+    if (glowIntensity > 0.005) {
+      const glow = ctx.createRadialGradient(CX + px, CY + py, 0, CX + px, CY + py, glowR);
+      glow.addColorStop(0, 'rgba(217, 164, 65, ' + glowIntensity.toFixed(3) + ')');
+      glow.addColorStop(1, 'rgba(5, 5, 10, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    /* ترنسفورم */
+    ctx.save();
+    ctx.translate(CX + px, CY + py);
+    ctx.rotate(shapeRot);
+    ctx.scale(SCALE * breathe, SCALE * breathe);
+
+    const e = morphProgress >= 1 ? 1 : easeInOutCubic(morphProgress);
+    const invScale = 1 / (SCALE * breathe);
+
+    /* رسم همه ذرات — بدون bloom، فقط نقطه */
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      /* موقعیت پایه */
+      let bx, by;
+      if (morphProgress >= 1) {
+        bx = p.tx; by = p.ty;
+      } else {
+        bx = lerp(p.sx, p.tx, e);
+        by = lerp(p.sy, p.ty, e);
+      }
+
+      /* لرزش طبیعی خیلی ملایم */
+      const sway = Math.sin(time * 0.9 + p.seed) * 0.0025 * currentPause;
+      bx += sway;
+      by += sway * 0.7;
+
+      /* اعمال offset از سنسور */
+      const fx = bx + p.ox;
+      const fy = by + p.oy;
+
+      /* رنگ */
+      let cr, cg, cb;
+      if (morphProgress >= 1) {
+        cr = p.tr; cg = p.tg; cb = p.tb;
+      } else {
+        cr = Math.round(lerp(p.sr, p.tr, e));
+        cg = Math.round(lerp(p.sg, p.tg, e));
+        cb = Math.round(lerp(p.sb, p.tb, e));
+      }
+
+      /* اندازه در فضای دستگاه */
+      const sizeBoost = morphProgress < 1 ? 1 + Math.sin(morphProgress * Math.PI) * 0.25 : 1;
+      const sz = p.size * invScale * 0.65 * sizeBoost;
+
+      /* آلفا */
+      const alpha = morphProgress < 1
+        ? 0.5 + e * 0.42
+        : 0.82 + Math.sin(time * 1.3 + p.seed) * 0.10;
+
+      /* رسم — fillRect سریع‌تر از arc برای ذرات کوچک */
+      ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + alpha.toFixed(3) + ')';
+      if (sz < 1.1) {
+        ctx.fillRect(fx - sz, fy - sz, sz * 2, sz * 2);
+      } else {
+        ctx.beginPath();
+        ctx.arc(fx, fy, sz, 0, TAU);
+        ctx.fill();
+      }
+    }
+
+    ctx.restore();
+
+    /* هستهٔ مرکزی — یک ذره درخشان */
+    const coreR = 3 + Math.sin(time * 1.3) * 0.8;
+    ctx.fillStyle = 'rgba(255, 250, 235, 0.85)';
+    ctx.beginPath();
+    ctx.arc(CX + px, CY + py, coreR, 0, TAU);
+    ctx.fill();
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     حلقه اصلی
+     ═══════════════════════════════════════════════════════ */
+  function loop(now) {
+    if (!running) return;
+    const dt = Math.min(0.05, (now - lastT) / 1000);
+    lastT = now;
+
+    /* FPS */
+    fpsAcc += dt; fpsCount++;
+    if (fpsAcc >= 0.5) {
+      const fpsEl = document.getElementById('fpsLabel');
+      if (fpsEl) fpsEl.textContent = Math.round(fpsCount / fpsAcc) + ' fps';
+      fpsAcc = 0; fpsCount = 0;
+    }
+
+    /* نرم‌سازی pause */
+    currentPause += (targetPause - currentPause) * 0.07;
+
+    /* نرم‌سازی ورودی */
+    currentMX += (targetMX - currentMX) * 0.09;
+    currentMY += (targetMY - currentMY) * 0.09;
+
+    /* ─── به‌روزرسانی فیزیک ذرات (سنسور/ماوس) ─── */
+    const ax = (currentMX - 0.5) * 2;   /* -1..1 */
+    const ay = (currentMY - 0.5) * 2;
+    const accelStrength = 0.0016 * (1 + motionMagnitude * 1.5);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      /* نیروی شتاب */
+      p.vx += ax * p.sensitivity * accelStrength;
+      p.vy += ay * p.sensitivity * accelStrength;
+
+      /* فنر به مرکز */
+      p.vx += -p.ox * 0.012;
+      p.vy += -p.oy * 0.012;
+
+      /* میرایی */
+      p.vx *= 0.955;
+      p.vy *= 0.955;
+
+      /* انتگرال */
+      p.ox += p.vx * currentPause;
+      p.oy += p.vy * currentPause;
+
+      /* کلمپ */
+      const maxOff = 0.14;
+      if (p.ox > maxOff) p.ox = maxOff;
+      if (p.ox < -maxOff) p.ox = -maxOff;
+      if (p.oy > maxOff) p.oy = maxOff;
+      if (p.oy < -maxOff) p.oy = -maxOff;
+    }
+
+    /* کاهش تدریجی شتاب shake */
+    motionMagnitude *= 0.94;
+
+    /* ─── morph ─── */
+    if (morphProgress < 1) {
+      morphProgress += dt / MORPH_DURATION;
+      if (morphProgress >= 1) {
+        morphProgress = 1;
+        const phaseEl = document.getElementById('phaseLabel');
+        if (phaseEl) phaseEl.textContent = 'HOLD';
+      }
+    } else {
+      holdTimer += dt * currentPause;
+      if (holdTimer >= HOLD_DURATION) {
+        nextShape();
+      }
+    }
+
+    time += dt * currentPause;
+
+    draw();
+
+    rafId = requestAnimationFrame(loop);
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     ورودی‌ها
+     ═══════════════════════════════════════════════════════ */
+
+  /* موس (دسکتاپ) */
+  window.addEventListener('mousemove', function (e) {
+    if (sensorActive) return;
+    targetMX = clamp(e.clientX / W, 0, 1);
+    targetMY = clamp(e.clientY / H, 0, 1);
+  }, { passive: true });
+
+  window.addEventListener('touchmove', function (e) {
+    if (sensorActive) return;
+    if (e.touches.length) {
+      const t = e.touches[0];
+      targetMX = clamp(t.clientX / W, 0, 1);
+      targetMY = clamp(t.clientY / H, 0, 1);
+    }
+  }, { passive: true });
+
+  /* ─── سنسور شتاب‌سنج ─── */
+  function handleMotion(e) {
+    const a = e.accelerationIncludingGravity || e.acceleration;
+    if (!a) return;
+
+    /* تشخیص فعال شدن */
+    if (!sensorActive) {
+      sensorActive = true;
+      const sEl = document.getElementById('sensorLabel');
+      if (sEl) sEl.textContent = 'SENSOR · ACTIVE';
+      const hEl = document.getElementById('sensorHint');
+      if (hEl) hEl.textContent = 'TILT · TO · SHAKE · PARTICLES';
+    }
+
+    /* تبدیل به -1..1 */
+    const gx = clamp((a.x || 0) / 9.8, -1, 1);
+    const gy = clamp((a.y || 0) / 9.8, -1, 1);
+    /* z معمولاً برای forward/back — استفاده نمی‌کنیم */
+
+    /* روی موبایل حالت پرتره:
+       x → چپ/راست
+       y → بالا/پایین (رو به بالا = 9.8)
+       بنابراین برای بالا/پایین معکوس می‌کنیم */
+    targetMX = 0.5 + gx * 0.5;
+    targetMY = 0.5 + (9.8 - Math.abs(a.y || 0)) / 9.8 * 0 - gy * 0.5 + 0.5 * 0;
+
+    /* ساده‌تر: y مستقیم */
+    targetMY = 0.5 - gy * 0.5;
+
+    /* محاسبه شدت تکان — تفاضل با مقدار قبلی */
+    const mag = Math.hypot(a.x || 0, a.y || 0, a.z || 0);
+    if (mag > 12) {
+      motionMagnitude = Math.min(1, motionMagnitude + (mag - 12) * 0.05);
+    }
+  }
+
+  function setupMotion() {
+    if (!window.DeviceMotionEvent) {
+      const sEl = document.getElementById('sensorLabel');
+      if (sEl) sEl.textContent = 'SENSOR · N/A';
+      const hEl = document.getElementById('sensorHint');
+      if (hEl) hEl.textContent = 'MOVE · MOUSE · TO · SHAKE · PARTICLES';
+      return;
+    }
+
+    /* iOS 13+ نیاز به اجازه دارد */
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+      const sEl = document.getElementById('sensorLabel');
+      if (sEl) sEl.textContent = 'SENSOR · TAP TO ENABLE';
+
+      const ask = function () {
+        DeviceMotionEvent.requestPermission().then(function (state) {
+          if (state === 'granted') {
+            window.addEventListener('devicemotion', handleMotion, { passive: true });
+          } else {
+            const sEl2 = document.getElementById('sensorLabel');
+            if (sEl2) sEl2.textContent = 'SENSOR · DENIED';
+          }
+        }).catch(function () {});
+        window.removeEventListener('click', ask);
+        window.removeEventListener('touchstart', ask);
+      };
+      window.addEventListener('click', ask);
+      window.addEventListener('touchstart', ask, { passive: true });
+    } else {
+      window.addEventListener('devicemotion', handleMotion, { passive: true });
+    }
+  }
+
+  /* ─── تعویض شکل ─── */
+  let clickLock = 0;
+  window.addEventListener('click', function (e) {
+    if (e.target.closest('.pause-btn')) return;
+    const now = performance.now();
+    if (now - clickLock < 350) return;
+    clickLock = now;
+    if (morphProgress < 0.85) return;
+    nextShape();
+  });
+
+  window.addEventListener('wheel', function (e) {
+    const now = performance.now();
+    if (now - clickLock < 500) return;
+    clickLock = now;
+    if (e.deltaY > 0) nextShape();
+    else prevShape();
+  }, { passive: true });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      setPaused(!paused);
+    }
+    if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
+      if (morphProgress >= 0.85) nextShape();
+    }
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
+      if (morphProgress >= 0.85) prevShape();
+    }
+  });
+
+  /* ─── دکمهٔ pause ─── */
+  const pauseBtn = document.getElementById('pauseBtn');
+  function setPaused(p) {
+    paused = p;
+    pauseBtn.classList.toggle('paused', p);
+    targetPause = p ? 0.04 : 1;
+  }
+  pauseBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    setPaused(!paused);
+  });
+
+  /* ─── مخفی شدن تب ─── */
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+    } else {
+      if (!running) {
+        running = true;
+        lastT = performance.now();
+        rafId = requestAnimationFrame(loop);
+      }
+    }
+  });
+
+  /* ─── resize ─── */
+  let rzTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(rzTimer);
+    rzTimer = setTimeout(resize, 150);
+  }, { passive: true });
+
+  /* ═══════════════════════════════════════════════════════
+     راه‌اندازی
+     ═══════════════════════════════════════════════════════ */
+  resize();
+  assignShape('rose');
+  setupMotion();
+
+  const pcEl = document.getElementById('particleCount');
+  if (pcEl) pcEl.textContent = N;
+
+  if (prefersReduced) targetPause = 0.45;
+
+  lastT = performance.now();
+  rafId = requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+  </html>
